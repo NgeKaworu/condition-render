@@ -1,6 +1,6 @@
-import React, { isValidElement, cloneElement } from "react";
-import compose from "./utils/compose";
-import getIn from "./utils/getIn";
+import React, { isValidElement, cloneElement } from 'react';
+import compose from './utils/compose';
+import getIn from './utils/getIn';
 
 export default (condition, params) => dispense(params)(condition);
 
@@ -13,44 +13,40 @@ export default (condition, params) => dispense(params)(condition);
 function dispense(params = {}, key) {
   return condition => {
     const {
-      "@pParams": paramChain,
-      "@pDecorator": decoratorChain,
-      "@props": props
+      '@pParams': paramChain,
+      '@pDecorator': decoratorChain,
+      '@props': props,
+      '@wrap': wrap,
     } = params;
-    // If is a React Class, Decorator
+
+    let element;
     if (isReactClass(condition)) {
+      // If is a React Class, Decorator
       const Component = condition;
-      return compose(
-        injectKey(key),
-        decoratorEnhance(decoratorChain, paramChain)
-      )(<Component {...props} />);
+      element = injectEnhance(decoratorChain, paramChain)(
+        <Component {...props} />
+      );
+    } else if (typeof condition === 'function') {
+      // is a function IoC
+      element = condition(params);
+    } else if (isValidElement(condition)) {
+      // If is a React instance, Decorator
+      element = injectEnhance(decoratorChain, paramChain)(
+        cloneElement(condition, props)
+      );
+    } else if (Array.isArray(condition)) {
+      // If is a Array, to classify
+      element = condition.map((c, idx) => dispense(params, idx)(c));
+    } else if (typeof condition === 'object' && condition !== null) {
+      // If is a Object, process condition object
+      element = recombineObject(condition, params);
+    } else {
+      // is a anthoer else
+      element = condition;
     }
-
-    // is a function IoC
-    if (typeof condition === "function") {
-      return injectKey(key)(condition(params));
-    }
-
-    // If is a React instance, Decorator
-    if (isValidElement(condition)) {
-      return compose(
-        injectKey(key),
-        decoratorEnhance(decoratorChain, paramChain)
-      )(cloneElement(condition, props));
-    }
-
-    // If is a Array, to classify
-    if (Array.isArray(condition)) {
-      return condition.map((c, idx) => dispense(params, idx)(c));
-    }
-
-    // If is a Object, process condition object
-    if (typeof condition === "object" && condition !== null) {
-      return injectKey(key)(recombineObject(condition, params));
-    }
-
-    // is a anthoer else
-    return injectKey(key)(condition);
+    console.log(wrap);
+    // injectEnhance(wrap, paramChain)
+    return compose(injectKey(key))(element);
   };
 }
 
@@ -62,40 +58,52 @@ function dispense(params = {}, key) {
  */
 export function recombineObject(condition = {}, params = {}) {
   const {
-    "@component": component,
-    "@decorator": decorator,
-    "@props": props,
+    '@component': component,
+    '@decorator': decorator,
+    '@props': props,
+    '@wrap': wrap,
     ...restCondition
   } = condition;
-  const { "@pDecorator": pDecorator, "@props": pProps, ...restParams } = params;
+  const {
+    '@pDecorator': pDecorator,
+    '@props': pProps,
+    '@wrap': pWrap,
+    ...restParams
+  } = params;
 
   const decoratorChain = formatValidChain(pDecorator, decorator);
   const paramChain = filterEmptyKey({
     ...restCondition,
-    ...restParams
+    ...restParams,
   });
+
   const propsChain = {
     ...pProps,
-    ...props
+    ...props,
   };
+
+  const wrapChain = formatValidChain(pWrap, wrap);
+
   if (
     component &&
-    typeof component === "object" &&
+    typeof component === 'object' &&
     !isValidElement(component)
   ) {
     const inheritChain = filterEmptyKey({
-      "@pParams": paramChain,
-      "@pDecorator": decoratorChain,
-      "@props": propsChain
+      '@pParams': paramChain,
+      '@pDecorator': decoratorChain,
+      '@props': propsChain,
+      '@wrap': wrapChain,
     });
     return dispense(inheritChain)(component);
   }
 
   return compose(
-    decoratorEnhance(decoratorChain, paramChain),
+    injectEnhance(decoratorChain, paramChain),
     dispense({
       ...paramChain,
-      "@props": propsChain
+      '@props': propsChain,
+      '@wrap': wrapChain,
     })
   )(component);
 }
@@ -105,17 +113,17 @@ export function recombineObject(condition = {}, params = {}) {
  * @param {Array} decorator : decoratorChain
  * @param {Object} params : all condtion chain props
  */
-export function decoratorEnhance(decorator, params) {
+export function injectEnhance(injector, params) {
   return component =>
-    functionHoist(decorator).reduceRight((acc, cur, key) => {
+    functionHoist(injector).reduceRight((acc, cur, key) => {
       if (
-        (typeof cur === "object" && !isValidElement(cur)) ||
+        (typeof cur === 'object' && !isValidElement(cur)) ||
         Array.isArray(cur)
       ) {
-        throw new Error("@decorator just arrow decorator or ReactElement");
+        throw new Error('@injector just arrow injector or ReactElement');
       }
       // if it's a function then ioc
-      if (typeof cur === "function" && !isReactClass(cur)) {
+      if (typeof cur === 'function' && !isReactClass(cur)) {
         return injectKey(key)(cur(acc, params));
       }
       // else render and wrap it
@@ -123,12 +131,12 @@ export function decoratorEnhance(decorator, params) {
       const parseDecorator = dispense(params)(cur);
       return cloneElement(parseDecorator, {
         children: formatValidChain(
-          injectKey(`decorator-${key}`)(
-            getIn(parseDecorator, ["props", "children"])
+          injectKey(`injector-${key}`)(
+            getIn(parseDecorator, ['props', 'children'])
           ),
           injectKey(`target-${key}`)(acc)
         ),
-        key
+        key,
       });
     }, component);
 }
@@ -172,10 +180,12 @@ export function functionHoist(chain = []) {
   return chain
     .reduce((acc, cur) => {
       const [elements = [], functions = []] = acc;
-      if (typeof cur === "function" && !isReactClass(cur)) {
+      if (typeof cur === 'function' && !isReactClass(cur)) {
         return [elements, [...functions, cur]];
       }
       return [[...elements, cur], functions];
     }, [])
     .reduce((acc, cur) => acc.concat(cur), []);
 }
+
+export function getConditionType(condition) {}
