@@ -17,7 +17,6 @@ function dispense(params = {}, key) {
       "@pDecorator": decoratorChain,
       "@props": props
     } = params;
-    console.log(props);
     // If is a React Class, Decorator
     if (isReactClass(condition)) {
       const Component = condition;
@@ -70,7 +69,6 @@ export function recombineObject(condition = {}, params = {}) {
   } = condition;
   const { "@pDecorator": pDecorator, "@props": pProps, ...restParams } = params;
 
-  console.log(props, pProps);
   const decoratorChain = formatValidChain(pDecorator, decorator);
   const paramChain = filterEmptyKey({
     ...restCondition,
