@@ -1,9 +1,10 @@
 import React from 'react';
 import { render} from 'react-dom';
-import MyComponent from '@/';
+import conditionRender from '@/';
 
-const App = () => (
- <MyComponent />
-);
+function App() {
+  const condition = [<input value={1} />, <input value={2} />, <input value={3} />];
+  return conditionRender(condition);
+}
 
 render(<App />, document.getElementById("root"));
