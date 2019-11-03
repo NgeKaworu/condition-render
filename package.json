@@ -1,0 +1,31 @@
+{
+  "name": "condition-render",
+  "version": "1.0.0",
+  "description": "Based on cpmcept of AOP, React json-schema render tool, Useful for large of forms.",
+  "main": "./lib/index.js",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NgeKaworu/condition-render.git"
+  },
+  "keywords": [
+    "react",
+    "AOP",
+    "form",
+    "antd",
+    "json-schema"
+  ],
+  "bugs": {
+    "url": "https://github.com/NgeKaworu/condition-render/issues"
+  },
+  "homepage": "https://github.com/NgeKaworu/condition-render#readme",
+  "author": "furan",
+  "mail": "NgeKaworu@163.com",
+  "license": "MIT"
+}
