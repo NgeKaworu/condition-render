@@ -113,6 +113,8 @@ function App({ form }) {
     // 装饰器函数的优先级一定大于组件
     '@decorator': [
       <Col span={8} />,
+      // target is leaf Component , params is It's attribute
+      // target 是 叶组件， params是它的参数
       (target, params) => {
         const { title } = params;
         return <Form.Item label={title}>{target}</Form.Item>;
@@ -174,6 +176,15 @@ Done.
 ![step2_2](./examples/doc/assets/step2_2.jpg)
 
 ## Api | 接口
+
+### condition
+
+| 属性 Property | 描述 Property                                                                                                | 类型 Type                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| @wrap         | component 的外包装，只作用于当前组件<br/>The wrapper of component, which only scope on the current component | `decorator function` `react class` `component`                  |
+| @decorator    | component 的装饰器，只作用于叶组件<br/>The decorator of component, which only scope on the leaf component    | `decorator function` `react class` `component`                  |
+| @component    | react 组件<br/>react component                                                                               | `function` `react class` `component` `array` `condition object` |
+| @props        | 会注入它下面每个组件<br/>will inject each component following it                                             | `object`                                                        |
 
 [rc-form]: https://www.npmjs.com/package/rc-form
 [grid-cn]: https://ant.design/components/grid-cn/
