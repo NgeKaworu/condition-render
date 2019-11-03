@@ -6,8 +6,8 @@ import 'antd/dist/antd.css';
 
 function App({ form }) {
   const { getFieldDecorator } = form;
-  const colCondition = {
-    '@wrap': <div style={{ background: 'red', padding: '10px' }}></div>,
+  const condition = {
+    '@wrap': [<Modal visible={true} />, <Form />, <Row gutter={8} />],
     '@decorator': [
       <Col span={8} />,
       (Target, params) => {
@@ -27,7 +27,6 @@ function App({ form }) {
         '@component': Input,
         value: 1,
         title: 'Input1',
-        '@wrap': <div style={{ background: 'blue', padding: '10px' }}></div>,
       },
       {
         '@component': Input,
@@ -42,12 +41,7 @@ function App({ form }) {
     ],
   };
 
-  const rowCondition = {
-    '@component': () => conditionRender(colCondition),
-    '@decorator': [<Modal visible={true} />, <Form />, <Row gutter={8} />],
-  };
-
-  return conditionRender(colCondition);
+  return conditionRender(condition);
 }
 
 const WithForm = Form.create()(App);

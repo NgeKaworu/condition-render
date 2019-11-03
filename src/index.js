@@ -39,11 +39,13 @@ function dispense(params = {}) {
       }
       case 'array': {
         // If is a Array, to classify
-        return condition.map((c, idx) =>
-          compose(
-            injectKey(idx),
-            dispense(params)
-          )(c)
+        return injectEnhance(wrap, paramChain)(
+          condition.map((c, idx) =>
+            compose(
+              injectKey(idx),
+              dispense(params)
+            )(c)
+          )
         );
       }
       case 'object': {
@@ -72,12 +74,7 @@ export function recombineObject(condition = {}, params = {}) {
     '@wrap': wrap,
     ...restCondition
   } = condition;
-  const {
-    '@pDecorator': pDecorator,
-    '@props': pProps,
-    '@wrap': pWrap,
-    ...restParams
-  } = params;
+  const { '@pDecorator': pDecorator, '@props': pProps, ...restParams } = params;
 
   const decoratorChain = formatValidChain(pDecorator, decorator);
   const paramChain = filterEmptyKey({
@@ -90,7 +87,7 @@ export function recombineObject(condition = {}, params = {}) {
     ...props,
   };
 
-  const wrapChain = formatValidChain(pWrap, wrap);
+  const wrapChain = formatValidChain(wrap);
 
   if (
     conditionType(component) === 'object' ||
@@ -106,11 +103,11 @@ export function recombineObject(condition = {}, params = {}) {
   }
 
   return compose(
+    injectEnhance(wrapChain, paramChain),
     injectEnhance(decoratorChain, paramChain),
     dispense({
       ...paramChain,
       '@props': propsChain,
-      '@wrap': wrapChain,
     })
   )(component);
 }
@@ -123,10 +120,7 @@ export function recombineObject(condition = {}, params = {}) {
 export function injectEnhance(injector, params) {
   return component =>
     functionHoist(injector).reduceRight((acc, cur, key) => {
-      if (
-        conditionType(component) === 'object' ||
-        conditionType(component) === 'array'
-      ) {
+      if (conditionType(cur) === 'object' || conditionType(cur) === 'array') {
         throw new Error('@injector just arrow decorator or ReactElement');
       }
       // if it's a function then ioc
