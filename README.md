@@ -23,7 +23,7 @@ yarn add condition-render -D
 ### Import | 引入
 
 ```javascript
-import conditionRender from "condition-render";
+import conditionRender from 'condition-render';
 ```
 
 ## Example | 例子
@@ -34,20 +34,20 @@ let us create three native `<input/>` tags following:
 我们先搞三个`<input />` 标签看看, 如下:
 
 ```js
-import React from "react";
-import { render } from "react-dom";
-import conditionRender from "condition-render";
+import React from 'react';
+import { render } from 'react-dom';
+import conditionRender from 'condition-render';
 
 function App() {
   const condition = [
     <input value={1} />,
     <input value={2} />,
-    <input value={3} />
+    <input value={3} />,
   ];
   return conditionRender(condition);
 }
 
-render(<App />, document.getElementById("root"));
+render(<App />, document.getElementById('root'));
 ```
 
 ![step1_1](./examples/doc/assets/step1_1.jpg)
@@ -92,22 +92,26 @@ We use Antd's Col Row [component][grid] for format and [rc-form][rc-form] for va
 我们用 Antd 的 Col Row[组件][grid-cn]来排版并用 [rc-form][rc-form] 来校验
 
 ```js
-import React, { useMemo } from "react";
-import { render } from "react-dom";
-import conditionRender from "@/";
-import { Input, Form, Col, Row } from "antd";
-import "antd/dist/antd.css";
+import React, { useMemo } from 'react';
+import { render } from 'react-dom';
+import conditionRender from 'condition-render';
+import { Input, Form, Col, Row } from 'antd';
+import 'antd/dist/antd.css';
 
 function App({ form }) {
   const { getFieldDecorator } = form;
-  const colCondition = {
-    // Here are the decorators we use for each of the following components
-    // 这里是我们给下面每一个组件使用的装饰器
+  const condition = {
+    // This is the wrapper around the current component,
+    // it's outside of @decorator, and only applies to the current scope
+    // 这是当前组件的外包装， 一定在@decorator外面，且只作用于当前层
+    '@wrap': [<Form />, <Row gutter={8} />],
+    // Here are the decorators will applies to each leaf components
+    // 这里的装饰器会作用于每一个叶组件
     // It can be a decorator or component
     // 可以是一个装饰器或组件
-    // The priority of the decorator must be greater than the component
-    // 装饰器的优先级一定大于组件
-    "@decorator": [
+    // The priority of the decorator function must be greater than the component
+    // 装饰器函数的优先级一定大于组件
+    '@decorator': [
       <Col span={8} />,
       (target, params) => {
         const { title } = params;
@@ -117,60 +121,50 @@ function App({ form }) {
         const { title, value } = params;
         return getFieldDecorator(title, {
           initialValue: value,
-          rules: [{ required: true, message: `please input ${title}` }]
+          rules: [{ required: true, message: `please input ${title}` }],
         })(target);
-      }
+      },
     ],
-    "@component": [
+    '@component': [
       {
-        "@component": Input,
+        '@component': Input,
         value: 1,
-        title: "Input1"
+        title: 'Input1',
       },
       {
-        "@component": Input,
+        '@component': Input,
         value: 2,
-        title: "Input2"
+        title: 'Input2',
       },
       {
-        "@component": Input,
+        '@component': Input,
         value: 3,
-        title: "Input3"
-      }
-    ]
+        title: 'Input3',
+      },
+    ],
   };
 
-  const rowCondition = {
-    // use functions to tell program that the component is a whole
-    // 我们用函数的方式告诉程序 这个component是一个整体
-    "@component": () => conditionRender(colCondition),
-    // These are its decorators
-    // 这些是它的装饰器
-    "@decorator": [<Form />, <Row gutter={8} />]
-  };
-
-  return conditionRender(rowCondition);
+  return conditionRender(condition);
 }
 
 const WithForm = Form.create()(App);
 
-render(<WithForm />, document.getElementById("root"));
+render(<WithForm />, document.getElementById('root'));
 ```
 
 ![step2_1](./examples/doc/assets/step2_1.jpg)
 
-Now let's make it a Modal
+Now let's make it be a Modal
 现在我们把它变成一个弹窗
 
 ```js
 // import it
 // 先引入它
-import { Input, Form, Col, Row, Modal } from "antd";
-const rowCondition = {
-  "@component": () => conditionRender(colCondition),
+import { Input, Form, Col, Row, Modal } from 'antd';
+const condition = {
   // And then add it here
   // 然后再这里添加
-  "@decorator": [<Modal visible={true} />, <Form />, <Row gutter={8} />]
+  '@wrap': [<Modal visible={true} />, <Form />, <Row gutter={8} />],
 };
 ```
 
@@ -180,7 +174,6 @@ Done.
 ![step2_2](./examples/doc/assets/step2_2.jpg)
 
 ## Api | 接口
-
 
 [rc-form]: https://www.npmjs.com/package/rc-form
 [grid-cn]: https://ant.design/components/grid-cn/
