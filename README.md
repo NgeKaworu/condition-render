@@ -26,9 +26,9 @@
 ### Install | 安装
 
 ```bash
-npm i condition-render -D
+npm i condition-render -S
 or
-yarn add condition-render -D
+yarn add condition-render -S
 ```
 
 ### Import | 引入
