@@ -1,6 +1,6 @@
 {
   "name": "condition-render",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Based on cpmcept of AOP, React json-schema render tool, Useful for large of forms.",
   "main": "lib/index.js",
   "scripts": {
