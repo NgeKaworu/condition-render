@@ -9,7 +9,6 @@ function App({ form }) {
   const condition = {
     '@wrap': [<Modal visible={true} />, <Form />, <Row gutter={8} />],
     '@decorator': [
-      <Col span={8} />,
       (Target, params) => {
         const { title } = params;
         return <Form.Item label={title}>{Target}</Form.Item>;
@@ -24,19 +23,45 @@ function App({ form }) {
     ],
     '@component': [
       {
+        '@decorator': <Col />,
         '@component': Input,
         value: 1,
         title: 'Input1',
       },
       {
-        '@component': Input,
-        value: 2,
-        title: 'Input2',
+        '@decorator': <Col span={12} />,
+        '@component': [
+          {
+            '@component': Input,
+            value: 2,
+            title: 'Input2',
+          },
+          {
+            '@component': Input,
+            value: 3,
+            title: 'Input3',
+          },
+        ],
       },
       {
-        '@component': Input,
-        value: 3,
-        title: 'Input3',
+        '@decorator': <Col span={8} />,
+        '@component': [
+          {
+            '@component': Input,
+            value: 4,
+            title: 'Input4',
+          },
+          {
+            '@component': Input,
+            value: 5,
+            title: 'Input5',
+          },
+          {
+            '@component': Input,
+            value: 6,
+            title: 'Input6',
+          },
+        ],
       },
     ],
   };
