@@ -41,7 +41,7 @@ import conditionRender from 'condition-render';
 
 ### Step1 simple render | 第一步 牛刀小试
 
-let us create three native `<input/>` tags following:
+let us create three native `<input/>` tags following:  
 我们先搞三个`<input />` 标签看看, 如下:
 
 ```js
@@ -63,7 +63,7 @@ render(<App />, document.getElementById('root'));
 
 ![step1_1](./examples/doc/assets/step1_1.jpg)
 
-replace native `<input />` with Antd [Input][input]
+replace native `<input />` with Antd [Input][input]  
 用 Antd 的 [Input][input-cn] 组件代替原生`<input/>`
 
 ```js
@@ -90,16 +90,16 @@ render(<App />, document.getElementById("root"));
 
 ![step1_2](./examples/doc/assets/step1_2.jpg)
 
-You may have noticed that condition can be Object, Array, React Element,
-React Component, or even a Function, let's continue.
-你也许注意到, condition 可以是 Object、 Array、 React Element、 React Component,
+You may have noticed that condition can be Object, Array, React Element,  
+React Component, or even a Function, let's continue.  
+你也许注意到, condition 可以是 Object、 Array、 React Element、 React Component,  
 其实它还可以是一个 Function, 让我们继续。
 
 ## Step2 format and validation | 第二步 格式化和校验
 
-Usually we need to do some format and validation.
-通常我们需要做一些排版和校验.
-We use Antd's Col Row [component][grid] for format and [rc-form][rc-form] for validation
+Usually we need to do some format and validation.  
+通常我们需要做一些排版和校验.  
+We use Antd's Col Row [component][grid] for format and [rc-form][rc-form] for validation  
 我们用 Antd 的 Col Row[组件][grid-cn]来排版并用 [rc-form][rc-form] 来校验
 
 ```js
@@ -167,7 +167,7 @@ render(<WithForm />, document.getElementById('root'));
 
 ![step2_1](./examples/doc/assets/step2_1.jpg)
 
-Now let's make it be a Modal
+Now let's make it be a Modal  
 现在我们把它变成一个弹窗
 
 ```js
