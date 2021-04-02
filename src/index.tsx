@@ -1,9 +1,12 @@
-import React, { isValidElement, cloneElement } from 'react';
-import compose from './utils/compose';
-import getIn from './utils/getIn';
+import React, { isValidElement, cloneElement } from "react";
+import compose from "./utils/compose";
 
 export default (condition, params) => dispense(params)(condition);
 
+export interface Condition {
+  "@params": Record<string, any>;
+  "@component": React.ReactNode;
+}
 /**
  * parse condition And classification
  * @param {Object} params : Conditin Object , a ReactElement's description
@@ -11,44 +14,46 @@ export default (condition, params) => dispense(params)(condition);
  * @return {Object | Array} ReactElement | ReactElements
  */
 function dispense(params = {}) {
-  return condition => {
+  return (condition) => {
     const {
-      '@pParams': paramChain,
-      '@pDecorator': decoratorChain,
-      '@props': props,
-      '@wrap': wrap,
+      "@pParams": paramChain,
+      "@pDecorator": decoratorChain,
+      "@props": props,
+      "@wrap": wrap,
     } = params;
 
     switch (conditionType(condition)) {
-      case 'react-class': {
+      case "react-class": {
         // If is a React Class, Decorator
         const Component = condition;
-        return injectEnhance(decoratorChain, paramChain)(
-          <Component {...props} />
-        );
+        return injectEnhance(
+          decoratorChain,
+          paramChain
+        )(<Component {...props} />);
       }
-      case 'function': {
+      case "function": {
         // is a function IoC
         return condition(params);
       }
-      case 'react-element': {
+      case "react-element": {
         // If is a React instance, Decorator
-        return injectEnhance(decoratorChain, paramChain)(
-          cloneElement(condition, props)
-        );
+        return injectEnhance(
+          decoratorChain,
+          paramChain
+        )(cloneElement(condition, props));
       }
-      case 'array': {
+      case "array": {
         // If is a Array, to classify
-        return injectEnhance(wrap, paramChain)(
+        return injectEnhance(
+          wrap,
+          paramChain
+        )(
           condition.map((c, idx) =>
-            compose(
-              injectKey(idx),
-              dispense(params)
-            )(c)
+            compose(injectKey(idx), dispense(params))(c)
           )
         );
       }
-      case 'object': {
+      case "object": {
         // If is a Object, process condition object
         return recombineObject(condition, params);
       }
@@ -68,13 +73,13 @@ function dispense(params = {}) {
  */
 export function recombineObject(condition = {}, params = {}) {
   const {
-    '@component': component,
-    '@decorator': decorator,
-    '@props': props,
-    '@wrap': wrap,
+    "@component": component,
+    "@decorator": decorator,
+    "@props": props,
+    "@wrap": wrap,
     ...restCondition
   } = condition;
-  const { '@pDecorator': pDecorator, '@props': pProps, ...restParams } = params;
+  const { "@pDecorator": pDecorator, "@props": pProps, ...restParams } = params;
 
   const decoratorChain = formatValidChain(pDecorator, decorator);
   const paramChain = filterEmptyKey({
@@ -90,14 +95,14 @@ export function recombineObject(condition = {}, params = {}) {
   const wrapChain = formatValidChain(wrap);
 
   if (
-    conditionType(component) === 'object' ||
-    conditionType(component) === 'array'
+    conditionType(component) === "object" ||
+    conditionType(component) === "array"
   ) {
     const inheritChain = filterEmptyKey({
-      '@pParams': paramChain,
-      '@pDecorator': decoratorChain,
-      '@props': propsChain,
-      '@wrap': wrapChain,
+      "@pParams": paramChain,
+      "@pDecorator": decoratorChain,
+      "@props": propsChain,
+      "@wrap": wrapChain,
     });
     return dispense(inheritChain)(component);
   }
@@ -107,7 +112,7 @@ export function recombineObject(condition = {}, params = {}) {
     injectEnhance(decoratorChain, paramChain),
     dispense({
       ...paramChain,
-      '@props': propsChain,
+      "@props": propsChain,
     })
   )(component);
 }
@@ -118,13 +123,13 @@ export function recombineObject(condition = {}, params = {}) {
  * @param {Object} params : all condtion chain props
  */
 export function injectEnhance(injector, params) {
-  return component =>
+  return (component) =>
     functionHoist(injector).reduceRight((acc, cur, key) => {
-      if (conditionType(cur) === 'object' || conditionType(cur) === 'array') {
-        throw new Error('@injector just arrow decorator or ReactElement');
+      if (conditionType(cur) === "object" || conditionType(cur) === "array") {
+        throw new Error("@injector just arrow decorator or ReactElement");
       }
       // if it's a function then ioc
-      if (conditionType(cur) === 'function') {
+      if (conditionType(cur) === "function") {
         return injectKey(key)(cur(acc, params));
       }
       // else render and wrap it
@@ -133,7 +138,7 @@ export function injectEnhance(injector, params) {
       return cloneElement(parseDecorator, {
         children: formatValidChain(
           injectKey(`injector-${key}`)(
-            getIn(parseDecorator, ['props', 'children'])
+            getIn(parseDecorator, ["props", "children"])
           ),
           injectKey(`target-${key}`)(acc)
         ),
@@ -147,7 +152,7 @@ export function isReactClass(condition) {
 }
 
 export function injectKey(key) {
-  return element =>
+  return (element) =>
     isValidElement(element) ? cloneElement(element, { key }) : element;
 }
 
@@ -181,7 +186,7 @@ export function functionHoist(chain = []) {
   return chain
     .reduce((acc, cur) => {
       const [elements = [], functions = []] = acc;
-      return conditionType(cur) === 'function'
+      return conditionType(cur) === "function"
         ? [elements, [...functions, cur]]
         : [[...elements, cur], functions];
     }, [])
@@ -190,14 +195,14 @@ export function functionHoist(chain = []) {
 
 export function conditionType(condition) {
   if (isReactClass(condition)) {
-    return 'react-class';
-  } else if (typeof condition === 'function') {
-    return 'function';
+    return "react-class";
+  } else if (typeof condition === "function") {
+    return "function";
   } else if (isValidElement(condition)) {
-    return 'react-element';
+    return "react-element";
   } else if (Array.isArray(condition)) {
-    return 'array';
-  } else if (typeof condition === 'object' && condition !== null) {
-    return 'object';
+    return "array";
+  } else if (typeof condition === "object" && condition !== null) {
+    return "object";
   }
 }
