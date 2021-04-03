@@ -24,6 +24,7 @@ module.exports = {
       node: {
         extensions: [".tsx", ".ts", ".js", ".json"],
       },
+      typescript: {},
     },
   },
 };
