@@ -6,12 +6,14 @@ const htmlWebpackPlugin = new HtmlWebpackPlugin({
 });
 
 module.exports = {
-  entry: path.join(__dirname, "examples/src/index.js"),
+  entry: path.join(__dirname, "examples/src/index.ts"),
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         use: "babel-loader",
+        // 缓存公共文件
+        options: { cacheDirectory: true },
         exclude: /node_modules/,
       },
       {
@@ -21,6 +23,8 @@ module.exports = {
       {
         test: /\.tsx?$/,
         use: "ts-loader",
+        // 缓存公共文件
+        options: { cacheDirectory: true },
         exclude: /node_modules/,
       },
     ],

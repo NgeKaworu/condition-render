@@ -1,7 +1,5 @@
 {
   "presets": [
-    "@babel/preset-react",
-    "@babel/preset-typescript",
     [
       "@babel/preset-env",
       {
@@ -9,7 +7,9 @@
         "modules": false, // 启用将ES6模块语法转换为其他模块类型，设置为false不会转换模块。
         "corejs": { "version": 3, "proposals": true } //指定 coreJs 版本
       }
-    ]
+    ],
+    "@babel/preset-react",
+    "@babel/preset-typescript"
   ],
   "plugins": [
     [
